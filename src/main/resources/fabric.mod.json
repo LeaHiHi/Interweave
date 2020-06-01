@@ -10,7 +10,7 @@
   "contributors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/com.xradius.interweave/icon.png",
+  "icon": "assets/com.xradius.interweave/icons8-discord-128.png",
   "environment": "server",
   "entrypoints": {
     "server": [

@@ -77,3 +77,5 @@ public class SettingsManager {
         return defaultSettings;
     }
 }
+
+
