@@ -1,0 +1,14 @@
+{
+  "discordToken" : "Bot token here...",
+  "channelId" : "Channel Id here...",
+  "chatFormat" : "**<%sender%>** %message%",
+  "joinFormat" : ":small_red_triangle: **%message%**",
+  "leaveFormat" : ":small_red_triangle_down: **%message%**",
+  "announcementFormat" : "***%message%***",
+  "deathFormat" : ":skull_crossbones: **%message%**",
+  "startFormat" : ":small_blue_diamond: **Server has started!**",
+  "stopFormat" : ":small_orange_diamond: **Server has stopped!**",
+  "advancementFormat": ":medal: **%message%**",
+  "emoteFormat": "*%sender% %message%*",
+  "discordToMinecraftFormat" : "§b§l<%sender%>§r %message%"
+}
