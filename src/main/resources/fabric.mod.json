@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "interweave",
+  "version": "${version}",
+  "name": "Interweave",
+  "description": "Discord <-> Minecraft via Fabric!",
+  "authors": [
+    "xradiusa"
+  ],
+  "contributors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/com.xradius.interweave/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "main.Interweave"
+    ]
+  },
+  "mixins": [
+    "interweave.mixin.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "minecraft": ">=1.16-Snapshot.20.21.a",
+    "fabric": "*"
+  }
+}
