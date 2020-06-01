@@ -40,7 +40,6 @@ public class Interweave implements DedicatedServerModInitializer {
     public static HashMap<String, String> mentionables;
 
     private static int tick = 0;
-    private static int users = 0;
 
     @Override
     public void onInitializeServer()  {
@@ -55,12 +54,8 @@ public class Interweave implements DedicatedServerModInitializer {
 
         ServerTickCallback.EVENT.register(server -> {
             tick++;
-            users++;
             if (tick % 240 == 0) {
-                if (users >= server.getMaxPlayerCount()) {
-                    users = 0;
-                }
-                jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, server.getCurrentPlayerCount() + "/" + server.getMaxPlayerCount() + " | " + server.getPlayerNames()[users]));
+                jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, server.getCurrentPlayerCount() + "/" + server.getMaxPlayerCount()));
                 if (tick == 1201) {
                     tick = 0;
                 }
