@@ -39,8 +39,6 @@ public class Interweave implements DedicatedServerModInitializer {
 
     public static HashMap<String, String> mentionables;
 
-    private static int tick = 0;
-
     @Override
     public void onInitializeServer()  {
         settings = SettingsManager.getInstance().getSettings();
@@ -51,16 +49,6 @@ public class Interweave implements DedicatedServerModInitializer {
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
         }
-
-        ServerTickCallback.EVENT.register(server -> {
-            tick++;
-            if (tick % 240 == 0) {
-                jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, server.getCurrentPlayerCount() + "/" + server.getMaxPlayerCount()));
-                if (tick == 1201) {
-                    tick = 0;
-                }
-            }
-        });
     }
 
     private void initJDA(Settings settings) throws LoginException, InterruptedException {
@@ -216,4 +204,7 @@ public class Interweave implements DedicatedServerModInitializer {
         return mentionables;
     }
 
+    public static void setPlayers(int current, int max) {
+        jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, current + "/" + max));
+    }
 }
