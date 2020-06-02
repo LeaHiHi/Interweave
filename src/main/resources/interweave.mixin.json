@@ -3,7 +3,8 @@
   "package": "mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinMinecraftServer"
+    "MixinMinecraftServer",
+    "MixinPlayerManager"
   ],
   "injectors": {
     "defaultRequire": 1
