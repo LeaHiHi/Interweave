@@ -15,6 +15,7 @@ import net.minecraft.text.Style;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DiscordListener extends ListenerAdapter {
@@ -41,9 +42,23 @@ public class DiscordListener extends ListenerAdapter {
             if (!previous.contains(message)) {
                 Style style = Style.EMPTY;
                 String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
+                if (message.getAttachments().size() > 0) {
+                    messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
+                }
                 server.getPlayerManager().sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
                 previous.add(message);
             }
         });
+    }
+
+    private String buildAttachmentsUrl(List<Message.Attachment> a) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; ; i++) {
+            sb.append(a.get(i - 1).getUrl());
+            if (i == a.size()) {
+                return sb.toString();
+            }
+            sb.append(' ');
+        }
     }
 }
