@@ -32,7 +32,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modCompile('net.dv8tion:JDA:4.1.1_154') {
+	compile('net.dv8tion:JDA:4.1.1_154') {
 		exclude module: 'opus-java'
 	}
 
@@ -43,6 +43,9 @@ dependencies {
 	include "com.fasterxml.jackson.core:jackson-databind:2.9.3"
 	include "com.fasterxml.jackson.core:jackson-annotations:2.9.0"
 	include "com.fasterxml.jackson.core:jackson-core:2.9.3"
+	compile "com.fasterxml.jackson.core:jackson-databind:2.9.3"
+	compile "com.fasterxml.jackson.core:jackson-annotations:2.9.0"
+	compile "com.fasterxml.jackson.core:jackson-core:2.9.3"
 	include "com.squareup.okhttp3:okhttp:3.9.1"
 	include "com.squareup.okhttp3:logging-interceptor:3.9.1"
 	include group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
