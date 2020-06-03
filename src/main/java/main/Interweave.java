@@ -1,5 +1,6 @@
 package main;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Interweave implements DedicatedServerModInitializer {
 
@@ -39,26 +42,30 @@ public class Interweave implements DedicatedServerModInitializer {
 
     public static HashMap<String, String> mentionables;
 
+    private static final ExecutorService ES = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat("Interweave").build());
+
     @Override
     public void onInitializeServer()  {
-        settings = SettingsManager.getInstance().getSettings();
-
         //JDA
-        try {
-            initJDA(settings);
-        } catch (LoginException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        ES.execute(() -> {
+            try {
+                settings = SettingsManager.getInstance().getSettings();
+                initJDA(settings);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void initJDA(Settings settings) throws LoginException, InterruptedException {
         if (settings.getDiscordToken() == null || settings.getDiscordToken().equals("Bot token here...")) {
-            log(Level.ERROR,"The Discord token is not configured correctly! The bot will now exit. Please check your InterweaveConfig.json file.");
-            System.exit(1);
+            log(Level.ERROR, "The Discord token is not configured correctly! The bot will not run. Please check your InterweaveConfig.json file.");
+            return;
         }
         if (settings.getChannelId() == null || settings.getChannelId().equals("Channel Id here...")) {
-            log(Level.ERROR, "The Channel Id is not configured correctly! The bot will now exit. Please check your InterweaveConfig.json file.");
-            System.exit(1);
+            log(Level.ERROR, "The Channel Id is not configured correctly! The bot will not run. Please check your InterweaveConfig.json file.");
+            return;
         }
 
         jda = JDABuilder.createLight(settings.getDiscordToken()).enableIntents(GatewayIntent.GUILD_MEMBERS).build();
@@ -70,77 +77,79 @@ public class Interweave implements DedicatedServerModInitializer {
     }
 
     public static void sendMessage(Text msg) {
-        //%message% message
-        //%sender% sender
-        if (!(msg instanceof TranslatableText)) {
-            return;
-        }
-        String key = ((TranslatableText) msg).getKey();
-        String message = msg.getString();
-        //admin command
-        if (key.equals("chat.type.admin")) {
-            return;
-        }
-        //server control
-        if (key.contains("commands")) {
-            return;
-        }
-        //advancement
-        if (key.contains("chat.type.advancement")) {
-            if (settings.getAdvancementFormat() == null) {
+        ES.execute(() -> {
+            //%message% message
+            //%sender% sender
+            if (!(msg instanceof TranslatableText)) {
                 return;
             }
-            message = settings.getAnnouncementFormat().replace("%message%", message).replace("[","").replace("]","").replace("(","").replace(")","");
-        }
-        //Player Joined
-        if (key.equals("multiplayer.player.joined")) {
-            if (settings.getJoinFormat() == null) {
+            String key = ((TranslatableText) msg).getKey();
+            String message = msg.getString();
+            //admin command
+            if (key.equals("chat.type.admin")) {
                 return;
             }
-            message = settings.getJoinFormat().replace("%message%", message);
-        }
-        //Player Left
-        if (key.equals("multiplayer.player.left")) {
-            if (settings.getLeaveFormat() == null) {
+            //server control
+            if (key.contains("commands")) {
                 return;
             }
-            message = settings.getLeaveFormat().replace("%message%", message);
-        }
-        // /Say
-        if (key.equals("chat.type.announcement")) {
-            if (settings.getAnnouncementFormat() == null) {
-                return;
+            //advancement
+            if (key.contains("chat.type.advancement")) {
+                if (settings.getAdvancementFormat() == null) {
+                    return;
+                }
+                message = settings.getAnnouncementFormat().replace("%message%", message).replace("[","").replace("]","").replace("(","").replace(")","");
             }
-            message = settings.getAnnouncementFormat().replace("%message%", message);
-        }
-        //Death
-        if (key.contains("death")) {
-            if (settings.getDeathFormat() == null) {
-                return;
+            //Player Joined
+            if (key.equals("multiplayer.player.joined")) {
+                if (settings.getJoinFormat() == null) {
+                    return;
+                }
+                message = settings.getJoinFormat().replace("%message%", message);
             }
-            message = settings.getDeathFormat().replace("%message%", message);
-        }
-        // /me Chat
-        if (key.equals("chat.type.emote")) {
-            if (settings.getEmoteFormat() == null) {
-                return;
+            //Player Left
+            if (key.equals("multiplayer.player.left")) {
+                if (settings.getLeaveFormat() == null) {
+                    return;
+                }
+                message = settings.getLeaveFormat().replace("%message%", message);
             }
-            message = settings.getEmoteFormat().replace("%sender%", ((LiteralText)((TranslatableText) msg).getArgs()[0]).getString()).replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
-        }
-        //Regular Chat
-        if (key.equals("chat.type.text")) {
-            if (settings.getChatFormat() == null) {
-                return;
+            // /Say
+            if (key.equals("chat.type.announcement")) {
+                if (settings.getAnnouncementFormat() == null) {
+                    return;
+                }
+                message = settings.getAnnouncementFormat().replace("%message%", message);
             }
-            message = settings.getChatFormat().replace("%sender%", ((LiteralText)((TranslatableText) msg).getArgs()[0]).getString()).replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
-        }
-        message = findMention(message);
-        try {
-            jda.awaitReady();
-            jda.getTextChannelById(settings.getChannelId()).sendMessage(message).queue();
-        } catch (Exception e) {
-
-        }
+            //Death
+            if (key.contains("death")) {
+                if (settings.getDeathFormat() == null) {
+                    return;
+                }
+                message = settings.getDeathFormat().replace("%message%", message);
+            }
+            // /me Chat
+            if (key.equals("chat.type.emote")) {
+                if (settings.getEmoteFormat() == null) {
+                    return;
+                }
+                message = settings.getEmoteFormat().replace("%sender%", ((LiteralText)((TranslatableText) msg).getArgs()[0]).getString()).replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
+            }
+            //Regular Chat
+            if (key.equals("chat.type.text")) {
+                if (settings.getChatFormat() == null) {
+                    return;
+                }
+                message = settings.getChatFormat().replace("%sender%", ((LiteralText)((TranslatableText) msg).getArgs()[0]).getString()).replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
+            }
+            message = findMention(message);
+            try {
+                jda.awaitReady();
+                jda.getTextChannelById(settings.getChannelId()).sendMessage(message).queue();
+            } catch (Exception e) {
+                log(Level.ERROR, "Exception thrown while sending a message to Discord!", e);
+            }
+        });
     }
 
     private static String findMention(String message) {
@@ -168,25 +177,33 @@ public class Interweave implements DedicatedServerModInitializer {
     }
 
     public static void sendStartMessage() {
-        try {
-            jda.awaitReady();
-            jda.getTextChannelById(settings.getChannelId()).sendMessage(settings.getStartFormat()).queue();
-        } catch (Exception e) {
-
-        }
+        ES.execute(() -> {
+            try {
+                jda.awaitReady();
+                jda.getTextChannelById(settings.getChannelId()).sendMessage(settings.getStartFormat()).queue();
+            } catch (Exception e) {
+                log(Level.ERROR, "Could not send start message to Discord!", e);
+            }
+        });
     }
 
     public static void sendStopMessage() {
-        try {
-            jda.awaitReady();
-            jda.getTextChannelById(settings.getChannelId()).sendMessage(settings.getStopFormat()).queue();
-        } catch (Exception e) {
-
-        }
+        ES.execute(() -> {
+            try {
+                jda.awaitReady();
+                jda.getTextChannelById(settings.getChannelId()).sendMessage(settings.getStopFormat()).queue();
+            } catch (Exception e) {
+                log(Level.ERROR, "Could not send start message to Discord!", e);
+            }
+        });
     }
 
     public static void log(Level level, String message){
         LOGGER.log(level, "["+MOD_NAME+"] " + message);
+    }
+
+    public static void log(Level level, String message, Throwable t){
+        LOGGER.log(level, "["+MOD_NAME+"] " + message, t);
     }
 
     public static Settings getSettings() {
@@ -205,6 +222,13 @@ public class Interweave implements DedicatedServerModInitializer {
     }
 
     public static void setPlayers(int current, int max) {
-        jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, current + "/" + max));
+        ES.execute(() -> {
+            try {
+                jda.getPresence().setActivity(Activity.of(Activity.ActivityType.DEFAULT, current + "/" + max));
+            } catch (Exception e) {
+                log(Level.ERROR, "Could not set player count!", e);
+            }
+        });
+
     }
 }
