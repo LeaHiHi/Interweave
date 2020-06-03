@@ -43,14 +43,17 @@ public class DiscordListener extends ListenerAdapter {
         if (!event.isFromType(ChannelType.TEXT)) {
             return;
         }
-
-        Style style = Style.EMPTY;
-        String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
-        if (message.getAttachments().size() > 0) {
-            messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
-        }
-        if (pm != null) {
-            pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
+        try {
+            Style style = Style.EMPTY;
+            String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
+            if (message.getAttachments().size() > 0) {
+                messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
+            }
+            if (pm != null) {
+                pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
+            }
+        } catch (Exception ex) {
+            Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);
         }
     }
 
