@@ -2,8 +2,6 @@ package utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 public class Settings {
     @JsonProperty("discordToken")
     private String discordToken;
