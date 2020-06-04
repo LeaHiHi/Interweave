@@ -187,13 +187,14 @@ public class Interweave implements DedicatedServerModInitializer {
         });
     }
 
-    public static void sendStopMessage() {
+    public static void sendStopMessageAndShutdown() {
         ES.execute(() -> {
             try {
                 jda.awaitReady();
                 jda.getTextChannelById(settings.getChannelId()).sendMessage(settings.getStopFormat()).queue();
+                jda.shutdown();
             } catch (Exception e) {
-                log(Level.ERROR, "Could not send start message to Discord!", e);
+                log(Level.ERROR, "Could not send stop message to Discord!", e);
             }
         });
     }
