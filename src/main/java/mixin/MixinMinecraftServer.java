@@ -30,7 +30,6 @@ public abstract class MixinMinecraftServer {
 
     @Inject(at = @At("HEAD"), method = "shutdown")
     public void stopServer(CallbackInfo ci) {
-        Interweave.sendStopMessage();
-        Interweave.jda.shutdown();
+        Interweave.sendStopMessageAndShutdown();
     }
 }
