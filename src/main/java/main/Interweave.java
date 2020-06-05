@@ -32,15 +32,14 @@ import java.util.concurrent.Executors;
 
 public class Interweave implements DedicatedServerModInitializer {
 
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
     private static Settings settings;
 
-    public static JDA jda;
+    private static JDA jda;
 
-    public static final String MOD_ID = "interweave";
-    public static final String MOD_NAME = "Interweave";
+    private static final String MOD_NAME = "Interweave";
 
-    public static HashMap<String, String> mentionables;
+    private static HashMap<String, String> mentionables;
 
     private static final ExecutorService ES = Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder().setNameFormat("Interweave").build());
@@ -211,7 +210,7 @@ public class Interweave implements DedicatedServerModInitializer {
         return settings;
     }
 
-    public static HashMap<String, String> buildDiscordMentionables() {
+    private static HashMap<String, String> buildDiscordMentionables() {
         Guild g = jda.getTextChannelById(SettingsManager.getInstance().getSettings().getChannelId()).getGuild();
         g.retrieveMembers().join(); // ..you MUST NOT use join()... https://i.kym-cdn.com/entries/icons/mobile/000/024/196/sign.jpg
         HashMap<String, String> mentionables = new HashMap<>();
