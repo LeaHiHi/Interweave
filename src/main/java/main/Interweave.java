@@ -195,11 +195,11 @@ public class Interweave implements DedicatedServerModInitializer {
     }
 
     public static void log(Level level, String message){
-        LOGGER.log(level, "["+MOD_NAME+"] " + message);
+        LOGGER.log(level, message);
     }
 
     public static void log(Level level, String message, Throwable t){
-        LOGGER.log(level, "["+MOD_NAME+"] " + message, t);
+        LOGGER.log(level, message, t);
     }
 
     public static Settings getSettings() {
