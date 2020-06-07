@@ -10,5 +10,6 @@
   "stopFormat" : ":small_orange_diamond: **Server has stopped!**",
   "advancementFormat": ":medal: **%message%**",
   "emoteFormat": "*%sender% %message%*",
-  "discordToMinecraftFormat" : "§b§l<%sender%>§r %message%"
+  "discordToMinecraftFormat" : "§b§l<%sender%>§r %message%",
+  "dingPlayersIfNameFound" : true
 }

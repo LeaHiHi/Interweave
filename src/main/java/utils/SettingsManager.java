@@ -71,6 +71,7 @@ public class SettingsManager {
         defaultSettings.setAdvancementFormat(":medal: **%message%**");
         defaultSettings.setDiscordToMinecraftFormat("§b§l<%sender%>§r %message%");
         defaultSettings.setEmoteFormat("*%sender% %message%*");
+        defaultSettings.setDingPlayersIfNameFound(true);
         return defaultSettings;
     }
 }

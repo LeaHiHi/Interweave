@@ -156,4 +156,17 @@ public class Settings {
     public void setDiscordToMinecraftFormat(String discordToMinecraftFormat) {
         this.discordToMinecraftFormat = discordToMinecraftFormat;
     }
+
+    @JsonProperty("dingPlayersIfNameFound")
+    private Boolean dingPlayersIfNameFound;
+
+    @JsonProperty("dingPlayersIfNameFound")
+    public Boolean getDingPlayersIfNameFound() {
+        return dingPlayersIfNameFound;
+    }
+
+    @JsonProperty("dingPlayersIfNameFound")
+    public void setDingPlayersIfNameFound(Boolean dingPlayersIfNameFound) {
+        this.dingPlayersIfNameFound = dingPlayersIfNameFound;
+    }
 }
