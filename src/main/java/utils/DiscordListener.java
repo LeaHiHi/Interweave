@@ -41,6 +41,7 @@ public class DiscordListener extends ListenerAdapter {
         if (!event.isFromType(ChannelType.TEXT)) {
             return;
         }
+        Interweave.log(Level.INFO, "<" + event.getAuthor().getAsTag() + "> " + event.getMessage().getContentDisplay());
         try {
             Style style = Style.EMPTY;
             String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
