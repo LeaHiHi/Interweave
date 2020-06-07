@@ -42,6 +42,11 @@ public class DiscordListener extends ListenerAdapter {
             return;
         }
         Interweave.log(Level.INFO, "<" + event.getAuthor().getAsTag() + "> " + event.getMessage().getContentDisplay());
+        if (SettingsManager.getInstance().getSettings().getDingPlayersIfNameFound() != null && SettingsManager.getInstance().getSettings().getDingPlayersIfNameFound()) { // :(
+            pm.getPlayerList().stream().findAny()
+                    .filter(spe -> event.getMessage().getContentDisplay().contains(spe.getName().asString()))
+                    .ifPresent(PlayerUtils::dingPlayer);
+        }
         try {
             Style style = Style.EMPTY;
             String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
