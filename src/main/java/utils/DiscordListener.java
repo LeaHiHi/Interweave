@@ -12,8 +12,8 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import org.apache.logging.log4j.Level;
+import org.lwjgl.system.NonnullDefault;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+    public void onMessageReceived(@NonnullDefault MessageReceivedEvent event) {
         JDA jda = event.getJDA();
 
         User author = event.getAuthor();

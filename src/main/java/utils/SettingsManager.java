@@ -1,15 +1,15 @@
 package utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
 import org.apache.logging.log4j.Level;
 
-import static jdk.nashorn.internal.objects.NativeMath.log;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import main.Interweave;
 
 // Thanks https://github.com/DV8FromTheWorld/Yui/blob/e8da929a8f637591e4da53599c39c8161be38746/src/net/dv8tion//SettingsManager.java
 public class SettingsManager {
@@ -27,13 +27,13 @@ public class SettingsManager {
 
     public SettingsManager() {
         if (!configFile.toFile().exists()) {
-            log(Level.INFO,"Creating default Settings");
-            log(Level.INFO,"You will need to edit the InterweaveConfig.json with your login information.");
+            Interweave.LOGGER.log(Level.INFO,"Creating default Settings");
+            Interweave.LOGGER.log(Level.INFO,"You will need to edit the InterweaveConfig.json with your login information.");
             this.settings = getDefaultSettings();
             try {
                 saveSettings();
             } catch (Exception e) {
-                log(Level.ERROR,"Error writing default settings!");
+            	Interweave.LOGGER.log(Level.ERROR,"Error writing default settings!");
             }
             System.exit(1);
         }
@@ -43,9 +43,9 @@ public class SettingsManager {
     public void loadSettings() {
         try {
             this.settings = om.readValue(configFile.toFile(), Settings.class);
-            log(Level.INFO, "Settings loaded");
+            Interweave.LOGGER.log(Level.INFO, "Settings loaded");
         } catch (Exception e) {
-            log(Level.ERROR,"Error Loading Settings");
+        	Interweave.LOGGER.log(Level.ERROR,"Error Loading Settings");
         }
     }
 

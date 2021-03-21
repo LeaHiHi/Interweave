@@ -21,8 +21,8 @@
     "interweave.mixin.json"
   ],
   "depends": {
-    "fabricloader": ">=0.4.0",
-    "minecraft": ">=1.16-Snapshot.20.21.a",
+    "fabricloader": ">=0.11.0",
+    "minecraft": ">=1.16.0",
     "fabric": "*"
   }
 }

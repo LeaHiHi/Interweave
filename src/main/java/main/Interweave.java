@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 
 public class Interweave implements DedicatedServerModInitializer {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
     private static Settings settings;
 
     private static JDA jda;
