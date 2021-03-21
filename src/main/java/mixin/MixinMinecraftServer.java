@@ -15,21 +15,21 @@ import java.util.UUID;
 @Mixin(MinecraftServer.class)
 public abstract class MixinMinecraftServer {
 
-    @Shadow public abstract int getMaxPlayerCount();
+//    @Shadow public abstract int getMaxPlayerCount();
 
     @Inject(at = @At("RETURN"), method = "sendSystemMessage")
-    public void sendMessage(Text text, UUID uUID, CallbackInfo ci) {
+    public void copySystemMessageToDiscord(Text text, UUID uUID, CallbackInfo ci) {
         Interweave.sendMessage(text);
     }
 
-    @Inject(at = @At("RETURN"), method = "prepareStartRegion")
-    public void startServer(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
-        Interweave.sendStartMessage();
-        Interweave.setPlayers(0, getMaxPlayerCount());
-    }
-
-    @Inject(at = @At("HEAD"), method = "shutdown")
-    public void stopServer(CallbackInfo ci) {
-        Interweave.sendStopMessageAndShutdown();
-    }
+//    @Inject(at = @At("RETURN"), method = "prepareStartRegion")
+//    public void startServer(WorldGenerationProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+//        Interweave.sendStartMessage();
+//        Interweave.setPlayers(0, getMaxPlayerCount());
+//    }
+//
+//    @Inject(at = @At("HEAD"), method = "shutdown")
+//    public void stopServer(CallbackInfo ci) {
+//        Interweave.sendStopMessageAndShutdown();
+//    }
 }
