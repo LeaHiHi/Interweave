@@ -3,6 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,6 +27,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
+import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.text.LiteralText;
@@ -70,7 +72,7 @@ public class Interweave implements DedicatedServerModInitializer {
 		});
 
 		// Setup server end callback
-		ServerLifecycleEvents.SERVER_STOPPED.register((MinecraftServer server) -> {
+		ServerLifecycleEvents.SERVER_STOPPING.register((MinecraftServer server) -> {
 			LOGGER.info("Interweave shutting down.");
 			sendStopMessageAndShutdown();
 			ES.shutdown();
@@ -116,7 +118,12 @@ public class Interweave implements DedicatedServerModInitializer {
 				return;
 			}
 			String key = ((TranslatableText) msg).getKey();
-			String message = msg.getString();
+			StringBuilder messageBuilder = new StringBuilder();
+			msg.visitSelf((section) -> {
+				messageBuilder.append(section);
+				return Optional.empty();
+			});
+			String message = messageBuilder.toString();
 			// admin command
 			if (key.equals("chat.type.admin")) {
 				return;
