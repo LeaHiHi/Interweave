@@ -1,10 +1,10 @@
 plugins {
-	id 'fabric-loom' version '0.6-SNAPSHOT'
+	id 'fabric-loom' version '0.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -13,34 +13,14 @@ group = project.maven_group
 repositories {
 	mavenLocal()
 	mavenCentral()
-	maven { url "http://zoidberg.ukp.informatik.tu-darmstadt.de/artifactory/public-releases/" }
-	jcenter()
 	maven {
 		name = 'Fabric'
-		url = 'http://maven.fabricmc.net/'
+		url = 'https://maven.fabricmc.net/'
 	}
 
 	maven {
-		name = 'legacy-fabric'
-		url = 'https://maven.legacyfabric.net/'
-	}
-
-	maven {
-		name = 'mojang'
-		url = 'https://libraries.minecraft.net/'
-	}
-
-	maven {
-		name = "CurseMaven"
-		url = "https://www.cursemaven.com"
-		content {
-			includeGroup "curse.maven"
-		}
-	}
-
-	maven {
-		name = "Jitpack"
-		url = "https://jitpack.io/"
+		name 'm2-dv8tion'
+		url 'https://m2.dv8tion.net/releases'
 	}
 }
 
@@ -53,48 +33,32 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	compile("net.dv8tion:JDA:${project.jda_version}") {
-		exclude module: 'opus-java'
-	}
-
 	include("net.dv8tion:JDA:${project.jda_version}") {
 		exclude module: 'opus-java'
 	}
+	modImplementation("net.dv8tion:JDA:${project.jda_version}") {
+		exclude module: 'opus-java'
+	}
 
-	include "com.fasterxml.jackson.core:jackson-databind:2.9.3"
-	include "com.fasterxml.jackson.core:jackson-annotations:2.9.0"
-	include "com.fasterxml.jackson.core:jackson-core:2.9.3"
-	compile "com.fasterxml.jackson.core:jackson-databind:2.9.3"
-	compile "com.fasterxml.jackson.core:jackson-annotations:2.9.0"
-	compile "com.fasterxml.jackson.core:jackson-core:2.9.3"
-	
-	include "com.squareup.okhttp3:okhttp:3.9.1"
-	/*
-	include "com.squareup.okhttp3:logging-interceptor:3.9.1"
-	*/
-	include 'org.slf4j:slf4j-nop:1.7.25'
-	include 'org.slf4j:slf4j-api:1.7.25'
-	
-	/*include "org.apache.logging.log4j:log4j-api:2.11.0"
-	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.1'
-	include group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.1'*/
+	include "com.fasterxml.jackson.core:jackson-databind:2.10.1"
+	include "com.fasterxml.jackson.core:jackson-annotations:2.10.1"
+	include "com.fasterxml.jackson.core:jackson-core:2.10.1"
+	modImplementation "com.fasterxml.jackson.core:jackson-databind:2.10.1"
+	modImplementation "com.fasterxml.jackson.core:jackson-annotations:2.10.1"
+	modImplementation "com.fasterxml.jackson.core:jackson-core:2.10.1"
+
 	include group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
 	include "com.squareup.okio:okio:1.13.0"
-	include "com.neovisionaries:nv-websocket-client:2.10"
-	include group: 'gnu.trove', name: 'trove', version: '3.0.3'
-
+	include "com.neovisionaries:nv-websocket-client:2.14"
+	include "com.squareup.okhttp3:okhttp:3.13.0"
+	include "net.sf.trove4j:trove4j:3.0.3"
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
+	filesMatching("fabric.mod.json") {
 		expand "version": project.version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
 	}
 }
 
@@ -105,13 +69,8 @@ tasks.withType(JavaCompile).configureEach {
 	// If Javadoc is generated, this must be specified in that task too.
 	it.options.encoding = "UTF-8"
 
-	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
-	// JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
-	// We'll use that if it's available, but otherwise we'll use the older option.
-	def targetVersion = 8
-	if (JavaVersion.current().isJava9Compatible()) {
-		 it.options.release = targetVersion
-	}
+	// Minecraft 1.17 (21w19a) upwards uses Java 16.
+	it.options.release = 16
 }
 
 java {
