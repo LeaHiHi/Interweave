@@ -22,14 +22,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.api.DedicatedServerModInitializer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
-import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerLoginNetworkHandler;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -77,17 +71,6 @@ public class Interweave implements DedicatedServerModInitializer {
 			sendStopMessageAndShutdown();
 			ES.shutdown();
 		});
-		
-		// Setup player connect event
-		ServerLoginConnectionEvents.INIT.register((ServerLoginNetworkHandler handler, MinecraftServer server) -> {
-			setPlayers(server.getCurrentPlayerCount() + 1, server.getMaxPlayerCount());
-		});
-		
-		// Setup player disconnect event
-		ServerLoginConnectionEvents.DISCONNECT.register((ServerLoginNetworkHandler handler, MinecraftServer server) -> {
-			setPlayers(server.getCurrentPlayerCount() - 1, server.getMaxPlayerCount());
-		});
-
 	}
 
 	private void initJDA(Settings settings) throws LoginException, InterruptedException {
