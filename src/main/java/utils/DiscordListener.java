@@ -2,30 +2,37 @@ package utils;
 
 import main.Interweave;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.fabricmc.fabric.api.event.server.ServerStartCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import org.apache.logging.log4j.Level;
-import org.lwjgl.system.NonnullDefault;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 public class DiscordListener extends ListenerAdapter {
     private PlayerManager pm;
 
     public DiscordListener() {
-        ServerStartCallback.EVENT.register(server -> pm = server.getPlayerManager());
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> pm = server.getPlayerManager());
     }
 
     @Override
-    public void onMessageReceived(@NonnullDefault MessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (pm == null) {
+            return;
+        }
         JDA jda = event.getJDA();
 
         User author = event.getAuthor();
@@ -53,22 +60,17 @@ public class DiscordListener extends ListenerAdapter {
             if (message.getAttachments().size() > 0) {
                 messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
             }
-            if (pm != null) {
-                pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
-            }
+            pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
         } catch (Exception ex) {
             Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);
         }
     }
 
-    private String buildAttachmentsUrl(List<Message.Attachment> a) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; ; i++) {
-            sb.append(a.get(i - 1).getUrl());
-            if (i == a.size()) {
-                return sb.toString();
-            }
-            sb.append(' ');
+    private String buildAttachmentsUrl(List<Message.Attachment> attachments) {
+        StringJoiner joiner = new StringJoiner(" ");
+        for (Message.Attachment attachment : attachments) {
+            joiner.add(attachment.getUrl());
         }
+        return joiner.toString();
     }
 }

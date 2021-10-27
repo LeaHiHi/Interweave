@@ -1,20 +1,6 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.security.auth.login.LoginException;
-
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -27,9 +13,20 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import utils.DiscordListener;
 import utils.Settings;
 import utils.SettingsManager;
+
+import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Interweave implements DedicatedServerModInitializer {
 
@@ -37,8 +34,6 @@ public class Interweave implements DedicatedServerModInitializer {
 	private static Settings settings;
 
 	private static JDA jda;
-
-	private static final String MOD_NAME = "Interweave";
 
 	private static HashMap<String, String> mentionables;
 
@@ -240,10 +235,8 @@ public class Interweave implements DedicatedServerModInitializer {
 
 	private static HashMap<String, String> buildDiscordMentionables() {
 		Guild g = jda.getTextChannelById(SettingsManager.getInstance().getSettings().getChannelId()).getGuild();
-		g.retrieveMembers().join(); // ..you MUST NOT use join()...
-									// https://i.kym-cdn.com/entries/icons/mobile/000/024/196/sign.jpg
 		HashMap<String, String> mentionables = new HashMap<>();
-		for (net.dv8tion.jda.api.entities.Member member : g.getMembers()) {
+		for (net.dv8tion.jda.api.entities.Member member : g.loadMembers().get()) {
 			User u = member.getUser();
 			mentionables.put(u.getName().toLowerCase(), u.getId());
 		}
