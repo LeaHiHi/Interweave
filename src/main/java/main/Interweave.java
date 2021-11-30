@@ -162,7 +162,7 @@ public class Interweave implements DedicatedServerModInitializer {
 				}
 				message = settings.getChatFormat()
 						.replace("%sender%", ((LiteralText) ((TranslatableText) msg).getArgs()[0]).getString())
-						.replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
+						.replace("%message%", ((LiteralText) ((TranslatableText) msg).getArgs()[1]).getString());
 			}
 			message = findMention(message);
 			try {
