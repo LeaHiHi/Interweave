@@ -12,6 +12,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import org.apache.logging.log4j.Level;
@@ -55,11 +57,19 @@ public class DiscordListener extends ListenerAdapter {
                     .ifPresent(PlayerUtils::dingPlayer);
         }
         try {
-            Style style = Style.EMPTY;
+            String authorHover = event.getGuild().getName()
+                    + " §o#" + event.getChannel().getName()
+                    + "§r\n" + author.getName() + '#'
+                    + author.getDiscriminator() + ' '
+                    + (author.isBot() ? "§3Bot§r" : "§2User§r")
+                    + '\n' + author.getId();
             String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
             if (message.getAttachments().size() > 0) {
                 messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
             }
+            Style style = Style.EMPTY
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(authorHover)))
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, author.getAsMention()));
             pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
         } catch (Exception ex) {
             Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);
