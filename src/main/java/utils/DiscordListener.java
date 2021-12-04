@@ -2,10 +2,7 @@ package utils;
 
 import main.Interweave;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -67,6 +64,9 @@ public class DiscordListener extends ListenerAdapter {
             if (message.getAttachments().size() > 0) {
                 messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
             }
+            if (message.getEmbeds().size() > 0) {
+                messageText = messageText + '\n' + buildEmbeds(message.getEmbeds());
+            }
             Style style = Style.EMPTY
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(authorHover)))
                     .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, author.getAsMention()));
@@ -80,6 +80,14 @@ public class DiscordListener extends ListenerAdapter {
         StringJoiner joiner = new StringJoiner(" ");
         for (Message.Attachment attachment : attachments) {
             joiner.add(attachment.getUrl());
+        }
+        return joiner.toString();
+    }
+
+    private String buildEmbeds(List<MessageEmbed> embeds) {
+        StringJoiner joiner = new StringJoiner("\n");
+        for (MessageEmbed e : embeds) {
+            joiner.add(EmbedFormatter.formatEmbed(e));
         }
         return joiner.toString();
     }
