@@ -2,16 +2,15 @@ package utils;
 
 import main.Interweave;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Style;
 import org.apache.logging.log4j.Level;
@@ -55,11 +54,22 @@ public class DiscordListener extends ListenerAdapter {
                     .ifPresent(PlayerUtils::dingPlayer);
         }
         try {
-            Style style = Style.EMPTY;
+            String authorHover = event.getGuild().getName()
+                    + " §o#" + event.getChannel().getName()
+                    + "§r\n" + author.getName() + '#'
+                    + author.getDiscriminator() + ' '
+                    + (author.isBot() ? "§3Bot§r" : "§2User§r")
+                    + '\n' + author.getId();
             String messageText = Interweave.getSettings().getDiscordToMinecraftFormat().replace("%sender%", author.getName()).replace("%message%", message.getContentDisplay());
             if (message.getAttachments().size() > 0) {
                 messageText = messageText + " " + buildAttachmentsUrl(message.getAttachments()); // append attachments URLs to the end of the message
             }
+            if (message.getEmbeds().size() > 0) {
+                messageText = messageText + '\n' + buildEmbeds(message.getEmbeds());
+            }
+            Style style = Style.EMPTY
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(authorHover)))
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, author.getAsMention()));
             pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
         } catch (Exception ex) {
             Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);
@@ -70,6 +80,14 @@ public class DiscordListener extends ListenerAdapter {
         StringJoiner joiner = new StringJoiner(" ");
         for (Message.Attachment attachment : attachments) {
             joiner.add(attachment.getUrl());
+        }
+        return joiner.toString();
+    }
+
+    private String buildEmbeds(List<MessageEmbed> embeds) {
+        StringJoiner joiner = new StringJoiner("\n");
+        for (MessageEmbed e : embeds) {
+            joiner.add(EmbedFormatter.formatEmbed(e));
         }
         return joiner.toString();
     }
