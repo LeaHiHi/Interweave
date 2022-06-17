@@ -10,9 +10,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +37,8 @@ public class Interweave implements DedicatedServerModInitializer {
 	private static JDA jda;
 
 	private static HashMap<String, String> mentionables;
+
+	private static String lastMessage;
 
 	private static final ExecutorService ES = Executors
 			.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Interweave").build());
@@ -88,16 +91,14 @@ public class Interweave implements DedicatedServerModInitializer {
 		mentionables = buildDiscordMentionables();
 	}
 
-	public static void sendMessage(Text msg) {
+	//
+	public static void sendMessage(TranslatableTextContent msg) {
 		ES.execute(() -> {
 			// %message% message
 			// %sender% sender
-			if (!(msg instanceof TranslatableText)) {
-				return;
-			}
-			String key = ((TranslatableText) msg).getKey();
+			String key = ((TranslatableTextContent) msg).getKey();
 			StringBuilder messageBuilder = new StringBuilder();
-			msg.visitSelf((section) -> {
+			msg.visit((section) -> {
 				messageBuilder.append(section);
 				return Optional.empty();
 			});
@@ -152,8 +153,8 @@ public class Interweave implements DedicatedServerModInitializer {
 					return;
 				}
 				message = settings.getEmoteFormat()
-						.replace("%sender%", ((LiteralText) ((TranslatableText) msg).getArgs()[0]).getString())
-						.replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
+						.replace("%sender%", ((LiteralTextContent) ((TranslatableTextContent) msg).getArgs()[0]).string())
+						.replace("%message%", ((TranslatableTextContent) msg).getArgs()[1].toString());
 			}
 			// Regular Chat
 			if (key.equals("chat.type.text")) {
@@ -161,8 +162,8 @@ public class Interweave implements DedicatedServerModInitializer {
 					return;
 				}
 				message = settings.getChatFormat()
-						.replace("%sender%", ((LiteralText) ((TranslatableText) msg).getArgs()[0]).getString())
-						.replace("%message%", ((TranslatableText) msg).getArgs()[1].toString());
+						.replace("%sender%", ((LiteralTextContent)((MutableText)msg.getArgs()[0]).getContent()).string())
+						.replace("%message%", ((LiteralTextContent)((TranslatableTextContent) msg).getArgs()[1]).string());
 			}
 			message = findMention(message);
 			try {
@@ -241,6 +242,14 @@ public class Interweave implements DedicatedServerModInitializer {
 			mentionables.put(u.getName().toLowerCase(), u.getId());
 		}
 		return mentionables;
+	}
+
+	public static void setLastMessage(String lastMessage) {
+		Interweave.lastMessage = lastMessage;
+	}
+
+	public static String getLastMessage() {
+		return lastMessage;
 	}
 
 	public static void setPlayers(int current, int max) {

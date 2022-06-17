@@ -6,13 +6,12 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageSender;
+import net.minecraft.network.message.MessageType;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.PlayerManager;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Style;
+import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +49,7 @@ public class DiscordListener extends ListenerAdapter {
         Interweave.log(Level.INFO, "<" + event.getAuthor().getAsTag() + "> " + event.getMessage().getContentDisplay());
         if (SettingsManager.getInstance().getSettings().getDingPlayersIfNameFound() != null && SettingsManager.getInstance().getSettings().getDingPlayersIfNameFound()) { // :(
             pm.getPlayerList().stream().findAny()
-                    .filter(spe -> event.getMessage().getContentDisplay().contains(spe.getName().asString()))
+                    .filter(spe -> event.getMessage().getContentDisplay().contains(spe.getName().getContent().toString()))
                     .ifPresent(PlayerUtils::dingPlayer);
         }
         try {
@@ -67,10 +66,8 @@ public class DiscordListener extends ListenerAdapter {
             if (message.getEmbeds().size() > 0) {
                 messageText = messageText + '\n' + buildEmbeds(message.getEmbeds());
             }
-            Style style = Style.EMPTY
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new LiteralText(authorHover)))
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, author.getAsMention()));
-            pm.sendToAll(new GameMessageS2CPacket(new LiteralText(messageText).setStyle(style), MessageType.CHAT, UUID.randomUUID()));
+            pm.broadcast(Text.of(messageText),MessageType.SYSTEM);
+            Interweave.setLastMessage(messageText);
         } catch (Exception ex) {
             Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);
         }
