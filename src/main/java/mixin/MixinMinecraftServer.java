@@ -1,15 +1,18 @@
 package mixin;
 
 import main.Interweave;
-import net.minecraft.network.message.MessageSender;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.lang.reflect.Parameter;
 
 @Mixin(MinecraftServer.class)
 public class MixinMinecraftServer {
@@ -20,8 +23,8 @@ public class MixinMinecraftServer {
     }
 
     @Inject(at = @At("RETURN"), method = "logChatMessage")
-    public void handleChatMessage(MessageSender ms, Text text, CallbackInfo ci) {
-        if (text.getContent() instanceof LiteralTextContent)
-            Interweave.sendMessage(new TranslatableTextContent("chat.type.text",new Object[]{ms.name(),text.getContent()}));
+    public void handleChatMessage(Text message, MessageType.Parameters params, String prefix, CallbackInfo ci) {
+        if (message.getContent() instanceof LiteralTextContent)
+            Interweave.sendMessage(new TranslatableTextContent("chat.type.text",new Object[]{params,message.getContent(),prefix}));
     }
 }

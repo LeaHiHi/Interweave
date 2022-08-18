@@ -6,11 +6,12 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.network.message.MessageSender;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.*;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +67,7 @@ public class DiscordListener extends ListenerAdapter {
             if (message.getEmbeds().size() > 0) {
                 messageText = messageText + '\n' + buildEmbeds(message.getEmbeds());
             }
-            pm.broadcast(Text.of(messageText),MessageType.SYSTEM);
+            pm.broadcast(Text.of(messageText),false);
             Interweave.setLastMessage(messageText);
         } catch (Exception ex) {
             Interweave.log(Level.ERROR, "Could not send Discord message to Minecraft!", ex);

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
@@ -162,8 +163,8 @@ public class Interweave implements DedicatedServerModInitializer {
 					return;
 				}
 				message = settings.getChatFormat()
-						.replace("%sender%", ((LiteralTextContent)((MutableText)msg.getArgs()[0]).getContent()).string())
-						.replace("%message%", ((LiteralTextContent)((TranslatableTextContent) msg).getArgs()[1]).string());
+						.replace("%sender%", ((LiteralTextContent)((MessageType.Parameters) msg.getArgs()[0]).name().getContent()).string())
+						.replace("%message%", ((LiteralTextContent)msg.getArgs()[1]).string());
 			}
 			message = findMention(message);
 			try {

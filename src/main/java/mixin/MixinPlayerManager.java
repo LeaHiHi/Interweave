@@ -2,7 +2,6 @@ package mixin;
 
 import main.Interweave;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.message.MessageSender;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
