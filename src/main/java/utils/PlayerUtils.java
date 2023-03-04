@@ -11,6 +11,6 @@ public class PlayerUtils {
      * @param serverPlayerEntity The ServerPlayerEntity to ding.
      */
     public static void dingPlayer(ServerPlayerEntity serverPlayerEntity) {
-        serverPlayerEntity.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME, SoundCategory.MASTER, 1.0F, 1.0F);
+        serverPlayerEntity.playSound(SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.MASTER, 1.0F, 1.0F);
     }
 }
