@@ -22,6 +22,6 @@ public class MixinMinecraftServer {
     @Inject(at = @At("RETURN"), method = "logChatMessage")
     public void handleChatMessage(Text message, MessageType.Parameters params, String prefix, CallbackInfo ci) {
         if (message.getContent() instanceof LiteralTextContent)
-            Interweave.sendMessage(new TranslatableTextContent("chat.type.text",new Object[]{params,message.getContent(),prefix}));
+            Interweave.sendMessage(new TranslatableTextContent("chat.type.text",null ,new Object[]{params,message.getContent(),prefix}));
     }
 }
