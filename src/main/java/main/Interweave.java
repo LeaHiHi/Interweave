@@ -11,7 +11,8 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.PlainTextContent;
+import net.minecraft.text.TextContent;
 import net.minecraft.text.TranslatableTextContent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -152,7 +153,7 @@ public class Interweave implements DedicatedServerModInitializer {
 					return;
 				}
 				message = settings.getEmoteFormat()
-						.replace("%sender%", ((LiteralTextContent) ((TranslatableTextContent) msg).getArgs()[0]).string())
+						.replace("%sender%", ((TextContent) ((TranslatableTextContent) msg).getArgs()[0]).toString())
 						.replace("%message%", ((TranslatableTextContent) msg).getArgs()[1].toString());
 			}
 			// Regular Chat
@@ -161,8 +162,8 @@ public class Interweave implements DedicatedServerModInitializer {
 					return;
 				}
 				message = settings.getChatFormat()
-						.replace("%sender%", ((LiteralTextContent)((MessageType.Parameters) msg.getArgs()[0]).name().getContent()).string())
-						.replace("%message%", ((LiteralTextContent)msg.getArgs()[1]).string());
+						.replace("%sender%", ((MessageType.Parameters) msg.getArgs()[0]).name().getString())
+						.replace("%message%", ((PlainTextContent) msg.getArgs()[1]).string());
 			}
 			message = findMention(message);
 			try {

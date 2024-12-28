@@ -3,6 +3,7 @@ package mixin;
 import main.Interweave;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ConnectedClientData;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ public class MixinPlayerManager {
     @Shadow @Final protected int maxPlayers;
 
     @Inject(at = @At("RETURN"), method = "onPlayerConnect")
-    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    public void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData ccd, CallbackInfo ci) {
         Interweave.setPlayers(players.size(), maxPlayers);
     }
 

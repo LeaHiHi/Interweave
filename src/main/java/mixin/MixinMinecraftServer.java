@@ -3,7 +3,7 @@ package mixin;
 import main.Interweave;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.TextContent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public class MixinMinecraftServer {
 
     @Inject(at = @At("RETURN"), method = "logChatMessage")
     public void handleChatMessage(Text message, MessageType.Parameters params, String prefix, CallbackInfo ci) {
-        if (message.getContent() instanceof LiteralTextContent)
+        if (message.getContent() instanceof TextContent)
             Interweave.sendMessage(new TranslatableTextContent("chat.type.text",null ,new Object[]{params,message.getContent(),prefix}));
     }
 }
